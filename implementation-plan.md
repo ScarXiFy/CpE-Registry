@@ -59,7 +59,8 @@ Pages to wireframe:
 
 ---
 
-## Phase 5 — Core Visitor Flow (PHP + MySQL)
+## Phase 5 — Core Visitor Flow (PHP + MySQL) ✅
+**Status:** Done  
 **Goal:** Build the working visitor-facing side of the app.  
 **Output:** Functional registration, sign-in, and sign-out pages connected to the database.
 
