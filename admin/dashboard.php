@@ -27,30 +27,34 @@ require_once '../includes/header.php';
             <div class="form-row">
                 <div class="form-col">
                     <label for="id_number">ID Number</label>
-                    <input type="text" id="id_number" name="id_number" value="<?= htmlspecialchars($filters['id_number']) ?>">
+                    <input type="text" id="id_number" name="id_number" value="<?= htmlspecialchars($filters['id_number'] ?? '') ?>">
                 </div>
                 <div class="form-col">
                     <label for="name">Name (First/Last)</label>
-                    <input type="text" id="name" name="name" value="<?= htmlspecialchars($filters['name']) ?>">
+                    <input type="text" id="name" name="name" value="<?= htmlspecialchars($filters['name'] ?? '') ?>">
                 </div>
                 <div class="form-col">
-                    <label for="visit_date">Date</label>
-                    <input type="date" id="visit_date" name="visit_date" value="<?= htmlspecialchars($filters['visit_date']) ?>">
+                    <label for="visit_date">Date (Day)</label>
+                    <input type="date" id="visit_date" name="visit_date" value="<?= htmlspecialchars($filters['visit_date'] ?? '') ?>">
+                </div>
+                <div class="form-col">
+                    <label for="visit_time">Time (Hour)</label>
+                    <input type="time" id="visit_time" name="visit_time" value="<?= htmlspecialchars($filters['visit_time'] ?? '') ?>">
                 </div>
             </div>
             
             <div class="form-row mt-2">
                 <div class="form-col">
                     <label for="city">City</label>
-                    <input type="text" id="city" name="city" value="<?= htmlspecialchars($filters['city']) ?>">
+                    <input type="text" id="city" name="city" value="<?= htmlspecialchars($filters['city'] ?? '') ?>">
                 </div>
                 <div class="form-col">
                     <label for="barangay">Barangay</label>
-                    <input type="text" id="barangay" name="barangay" value="<?= htmlspecialchars($filters['barangay']) ?>">
+                    <input type="text" id="barangay" name="barangay" value="<?= htmlspecialchars($filters['barangay'] ?? '') ?>">
                 </div>
                 <div class="form-col">
                     <label for="province">Province</label>
-                    <input type="text" id="province" name="province" value="<?= htmlspecialchars($filters['province']) ?>">
+                    <input type="text" id="province" name="province" value="<?= htmlspecialchars($filters['province'] ?? '') ?>">
                 </div>
             </div>
 
@@ -63,7 +67,7 @@ require_once '../includes/header.php';
 
     <div class="card">
         <h3>Visit Logs</h3>
-        <?php if (count($results) > 0): ?>
+        <?php if (!empty($results)): ?>
             <div class="table-responsive">
                 <table class="table">
                     <thead>

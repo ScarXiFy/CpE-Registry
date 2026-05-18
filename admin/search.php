@@ -25,7 +25,8 @@ $filters = [
     'province' => $_GET['province'] ?? '',
     'id_number' => $_GET['id_number'] ?? '',
     'name' => $_GET['name'] ?? '',
-    'visit_date' => $_GET['visit_date'] ?? ''
+    'visit_date' => $_GET['visit_date'] ?? '',
+    'visit_time' => $_GET['visit_time'] ?? ''
 ];
 
 $has_filters = array_filter($filters);
@@ -63,6 +64,12 @@ if ($has_filters) {
     if (!empty($filters['visit_date'])) {
         $sql .= " AND DATE(l.sign_in) = ?";
         $params[] = $filters['visit_date'];
+    }
+    if (!empty($filters['visit_time'])) {
+        // Match the exact hour and minute if provided (or just format appropriately)
+        // Since HTML input type time returns HH:MM, we can use LIKE or exact match with TIME()
+        $sql .= " AND TIME(l.sign_in) LIKE ?";
+        $params[] = $filters['visit_time'] . "%";
     }
 
     $sql .= " ORDER BY l.sign_in DESC";
