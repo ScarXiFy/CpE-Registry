@@ -7,9 +7,11 @@
  * If the admin is not logged in, it redirects to admin/login.php.
  */
 
-// TODO (Phase 7): implement session guard
-// session_start();
-// if (empty($_SESSION['admin_logged_in'])) {
-//     header('Location: /CpE-Registry/admin/login.php');
-//     exit;
-// }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (empty($_SESSION['admin_logged_in'])) {
+    header('Location: login.php');
+    exit;
+}

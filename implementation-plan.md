@@ -90,7 +90,8 @@ Build in this order:
 
 ---
 
-## Phase 7 — Session Handling and Security
+## Phase 7 — Session Handling and Security ✅
+**Status:** Done  
 **Goal:** Lock admin pages behind a session check and sanitize all inputs.  
 **Output:** `includes/auth_check.php` included at the top of every admin page; sanitized queries.
 

@@ -18,7 +18,7 @@ require_once '../includes/header.php';
 <main class="container admin-dashboard">
     <div class="header-actions">
         <h1>Admin Dashboard — Visitor Search</h1>
-        <!-- Phase 7 logout placeholder (can be linked later) -->
+        <a href="logout.php" class="btn btn-secondary">Logout</a>
     </div>
 
     <div class="card mb-3">
