@@ -23,10 +23,7 @@
     <header class="main-header">
         <div class="header-container">
             <a href="/CpE-Registry/index.php" class="logo-link">
-                <!-- Using an icon as proxy for the actual logo -->
-                <div class="logo-circle">
-                    <i class="fa-solid fa-microchip"></i>
-                </div>
+                <img src="/CpE-Registry/assets/img/usc-cpe-logo.png" alt="USC CpE Logo" class="header-logo-img">
                 <span class="logo-text">USC CpE Registry</span>
             </a>
             <nav class="header-nav">

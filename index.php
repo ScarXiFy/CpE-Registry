@@ -10,7 +10,7 @@ require_once 'includes/header.php';
     <section class="hero-section">
         <div class="hero-content">
             <div class="hero-logo-large">
-                <i class="fa-solid fa-microchip"></i>
+                <img src="/CpE-Registry/assets/img/usc-cpe-logo.png" alt="USC CpE Logo" class="hero-logo-img">
             </div>
             <h1 class="hero-title">USC CpE Registry</h1>
             <p class="hero-subtitle">Dedicated digital infrastructure for the University of San Carlos, Department of Computer Engineering. Built for efficiency, security, and accessibility.</p>
