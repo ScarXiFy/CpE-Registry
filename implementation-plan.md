@@ -28,7 +28,8 @@ Key folders to establish:
 
 ---
 
-## Phase 3 — Database Design (ERD + SQL Schema)
+## Phase 3 — Database Design (ERD + SQL Schema) ✅
+**Status:** Done  
 **Goal:** Design the tables before touching PHP. Everything downstream depends on this.  
 **Output:** ERD diagram (for submission) + `database/schema.sql` ready to import in phpMyAdmin.
 
