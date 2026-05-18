@@ -1,0 +1,11 @@
+-- database/schema.sql
+-- Full SQL schema — to be designed and written in Phase 3.
+--
+-- Tables planned:
+--   visitors   — stores registration data
+--   visit_logs — records each sign-in / sign-out event
+--   admin      — admin credentials
+--
+-- Import this file in phpMyAdmin once Phase 3 is complete.
+
+-- TODO (Phase 3): add CREATE DATABASE and CREATE TABLE statements here
