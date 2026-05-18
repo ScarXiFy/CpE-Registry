@@ -42,7 +42,8 @@ Tables to plan:
 
 ---
 
-## Phase 4 — UI Wireframes and Prototype
+## Phase 4 — UI Wireframes and Prototype ✅
+**Status:** Done  
 **Goal:** Design the pages before coding them, so you know exactly what to build.  
 **Output:** Wireframes in Figma or a stitching tool (required for submission).
 
