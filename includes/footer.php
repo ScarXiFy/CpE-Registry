@@ -6,6 +6,10 @@
  * Outputs the closing </body>, </html> tags and footer markup.
  */
 ?>
-<!-- TODO (Phase 9): add footer content here -->
+    <footer class="main-footer">
+        <div class="container text-center">
+            <p>University of San Carlos — Department of Computer Engineering</p>
+        </div>
+    </footer>
 </body>
 </html>

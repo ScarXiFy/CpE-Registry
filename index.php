@@ -1,59 +1,54 @@
 <?php
 /**
  * index.php
- * Visitor landing page — ID lookup + routing.
- * 
- * Flow (Phase 5):
- *  1. Show a form asking for the visitor's ID number.
- *  2. If the ID exists in `visitors` → redirect to signin.php.
- *  3. If the ID does not exist → redirect to register.php.
+ * Visitor landing page.
  */
-
-require_once 'config/db.php';
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_number = trim($_POST['id_number'] ?? '');
-    
-    if (!empty($id_number)) {
-        // Check if ID exists in visitors
-        $stmt = $pdo->prepare("SELECT id FROM visitors WHERE id_number = ?");
-        $stmt->execute([$id_number]);
-        $visitor = $stmt->fetch();
-        
-        if ($visitor) {
-            // Visitor exists, go to sign in
-            header("Location: signin.php?id=" . urlencode($id_number));
-            exit;
-        } else {
-            // Visitor does not exist, go to register
-            header("Location: register.php?id=" . urlencode($id_number));
-            exit;
-        }
-    } else {
-        $error = 'Please enter your ID number.';
-    }
-}
-
 require_once 'includes/header.php';
 ?>
 
-<main class="container">
-    <div class="card">
-        <h1>CpE Department — Contact Tracing</h1>
-        <p>Enter your ID number to sign in or register.</p>
-        
-        <?php if ($error): ?>
-            <div class="alert error"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
+<main class="landing-page">
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-logo-large">
+                <i class="fa-solid fa-microchip"></i>
+            </div>
+            <h1 class="hero-title">USC CpE Registry</h1>
+            <p class="hero-subtitle">Dedicated digital infrastructure for the University of San Carlos, Department of Computer Engineering. Built for efficiency, security, and accessibility.</p>
+            
+            <div class="hero-actions">
+                <a href="signin.php" class="btn btn-primary btn-lg">Sign In</a>
+                <a href="register.php" class="btn btn-outline btn-lg">Register</a>
+            </div>
+        </div>
+    </section>
 
-        <form method="POST" action="index.php" class="form-group">
-            <label for="id_number">ID Number:</label>
-            <input type="text" id="id_number" name="id_number" required autofocus>
-            <button type="submit" class="btn btn-primary">Continue</button>
-        </form>
-    </div>
+    <section class="features-section">
+        <div class="container features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <h3 class="feature-title">Register Once</h3>
+                <p class="feature-desc">First-time visitors fill out a short form.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-regular fa-id-badge"></i>
+                </div>
+                <h3 class="feature-title">Quick Sign In</h3>
+                <p class="feature-desc">Return with just your ID number.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa-regular fa-circle-check"></i>
+                </div>
+                <h3 class="feature-title">Sign Out When Leaving</h3>
+                <p class="feature-desc">Always log your exit for accurate records.</p>
+            </div>
+        </div>
+    </section>
 </main>
 
 <?php require_once 'includes/footer.php'; ?>
