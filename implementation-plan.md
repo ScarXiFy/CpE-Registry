@@ -75,7 +75,8 @@ Build in this order:
 
 ---
 
-## Phase 6 — Admin Panel
+## Phase 6 — Admin Panel ✅
+**Status:** Done  
 **Goal:** Build the admin-side interface with login and search functionality.  
 **Output:** Working admin login + dashboard with all six required search filters.
 
