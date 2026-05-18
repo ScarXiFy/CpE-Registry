@@ -104,7 +104,8 @@ Tasks:
 
 ---
 
-## Phase 8 — Use Case Diagram
+## Phase 8 — Use Case Diagram ✅
+**Status:** Done  
 **Goal:** Produce the required UML Use Case Diagram for submission.  
 **Output:** Diagram image exported and included in the final ZIP.
 
