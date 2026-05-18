@@ -13,6 +13,13 @@ require_once 'config/db.php';
 
 $id_number = $_GET['id'] ?? '';
 $error = '';
+$first_name = '';
+$last_name = '';
+$barangay = '';
+$city = '';
+$province = '';
+$contact_number = '';
+$email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_number = trim($_POST['id_number'] ?? '');
@@ -26,6 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($id_number) || empty($first_name) || empty($last_name) || empty($barangay) || empty($city) || empty($province) || empty($contact_number) || empty($email)) {
         $error = 'All fields are required.';
+    } elseif (!preg_match('/^[A-Za-z0-9-]{3,30}$/', $id_number)) {
+        $error = 'ID number may only contain letters, numbers, and dashes.';
+    } elseif (strlen($first_name) < 2 || strlen($last_name) < 2) {
+        $error = 'First name and last name must be at least 2 characters.';
+    } elseif (!preg_match('/^[0-9+() -]{7,20}$/', $contact_number)) {
+        $error = 'Please enter a valid contact number.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address.';
     } else {
         try {
             $pdo->beginTransaction();
@@ -58,46 +73,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once 'includes/header.php';
 ?>
 
-<main class="container">
-    <div class="card">
-        <h1>New Visitor Registration</h1>
-        <p>Please fill out the form to register and automatically sign in.</p>
-
-        <?php if ($error): ?>
-            <div class="alert error"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-
-        <form method="POST" action="register.php" class="form-group">
-            <label for="id_number">ID Number</label>
-            <input type="text" id="id_number" name="id_number" value="<?= htmlspecialchars($id_number) ?>" required readonly>
-
-            <label for="first_name">First Name</label>
-            <input type="text" id="first_name" name="first_name" required autofocus>
-
-            <label for="last_name">Last Name</label>
-            <input type="text" id="last_name" name="last_name" required>
-
-            <label for="barangay">Barangay</label>
-            <input type="text" id="barangay" name="barangay" required>
-
-            <label for="city">City</label>
-            <input type="text" id="city" name="city" required>
-
-            <label for="province">Province</label>
-            <input type="text" id="province" name="province" required>
-
-            <label for="contact_number">Contact Number</label>
-            <input type="text" id="contact_number" name="contact_number" required>
-
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" required>
-
-            <div class="actions">
-                <a href="index.php" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Register & Sign In</button>
+<main class="form-page registration-page">
+    <section class="form-shell reveal-on-scroll">
+        <div class="registration-card">
+            <div class="form-card-header">
+                <span class="form-card-kicker">Required Information</span>
+                <h1>New Visitor Registration</h1>
+                <p>Create your visitor record once, then you will be automatically signed in for this visit.</p>
             </div>
-        </form>
-    </div>
+
+            <?php if ($error): ?>
+                <div class="alert error"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+
+            <form method="POST" action="register.php" class="form-group enhanced-form" data-enhanced-form>
+                <div class="field-grid">
+                    <div class="field full-width">
+                        <label for="id_number">ID Number</label>
+                        <input
+                            type="text"
+                            id="id_number"
+                            name="id_number"
+                            value="<?= htmlspecialchars($id_number) ?>"
+                            placeholder="21700003"
+                            pattern="[A-Za-z0-9-]{3,30}"
+                            minlength="3"
+                            maxlength="30"
+                            required
+                            <?= $id_number ? '' : 'autofocus' ?>
+                        >
+                        <small>Letters, numbers, and dashes only.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="first_name">First Name</label>
+                        <input
+                            type="text"
+                            id="first_name"
+                            name="first_name"
+                            value="<?= htmlspecialchars($first_name) ?>"
+                            placeholder="John Enrico"
+                            minlength="2"
+                            maxlength="80"
+                            required
+                            <?= $id_number ? 'autofocus' : '' ?>
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="last_name">Last Name</label>
+                        <input
+                            type="text"
+                            id="last_name"
+                            name="last_name"
+                            value="<?= htmlspecialchars($last_name) ?>"
+                            placeholder="Lauron"
+                            minlength="2"
+                            maxlength="80"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="barangay">Barangay</label>
+                        <input
+                            type="text"
+                            id="barangay"
+                            name="barangay"
+                            value="<?= htmlspecialchars($barangay) ?>"
+                            placeholder="e.g. Talamban"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="city">City</label>
+                        <input
+                            type="text"
+                            id="city"
+                            name="city"
+                            value="<?= htmlspecialchars($city) ?>"
+                            placeholder="e.g. Cebu City"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="province">Province</label>
+                        <input
+                            type="text"
+                            id="province"
+                            name="province"
+                            value="<?= htmlspecialchars($province) ?>"
+                            placeholder="e.g. Cebu"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="contact_number">Contact Number</label>
+                        <input
+                            type="tel"
+                            id="contact_number"
+                            name="contact_number"
+                            value="<?= htmlspecialchars($contact_number) ?>"
+                            placeholder="e.g. 0917 123 4567"
+                            pattern="[0-9+() -]{7,20}"
+                            minlength="7"
+                            maxlength="20"
+                            required
+                        >
+                    </div>
+
+                    <div class="field full-width">
+                        <label for="email">Email Address</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="<?= htmlspecialchars($email) ?>"
+                            placeholder="johnenricolauron@gmail.com"
+                            maxlength="120"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="actions form-actions">
+                    <a href="index.php" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-with-motion">Register & Sign In</button>
+                </div>
+            </form>
+        </div>
+    </section>
 </main>
 
 <?php require_once 'includes/footer.php'; ?>

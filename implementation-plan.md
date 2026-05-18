@@ -117,6 +117,7 @@ Use cases to cover: Register, Sign In, Sign Out, Look Up by ID, Admin Login, Sea
 ---
 
 ## Phase 9 — Styling and UI Polish
+**Status:** Done  
 **Goal:** Make the app look user-friendly, not just functional.  
 **Output:** Consistent CSS across all pages.
 
