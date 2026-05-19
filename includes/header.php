@@ -26,8 +26,10 @@
                 <img src="/CpE-Registry/assets/img/usc-cpe-logo.png" alt="USC CpE Logo" class="header-logo-img">
                 <span class="logo-text">USC CpE Registry</span>
             </a>
-            <nav class="header-nav">
-                <a href="/CpE-Registry/admin/login.php" class="nav-link">Admin Login</a>
-            </nav>
+            <?php if (empty($hide_admin_login)): ?>
+                <nav class="header-nav">
+                    <a href="/CpE-Registry/admin/login.php" class="nav-link">Admin Login</a>
+                </nav>
+            <?php endif; ?>
         </div>
     </header>

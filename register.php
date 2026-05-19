@@ -4,14 +4,16 @@
  * First-time visitor registration form.
  *
  * Flow (Phase 5):
- *  1. Display a form: ID Number, Full Name, Address, Contact, Email.
+ *  1. Display a form: Optional ID Number, Full Name, Address, Contact, Email.
  *  2. On submit → INSERT into `visitors`, then auto-sign-in (INSERT into `visit_logs`).
  *  3. Redirect to a sign-in confirmation screen.
  */
 
 require_once 'config/db.php';
+require_once 'includes/visit_log.php';
 
 $id_number = $_GET['id'] ?? '';
+$visitor_type = 'usc';
 $error = '';
 $first_name = '';
 $last_name = '';
@@ -22,6 +24,7 @@ $contact_number = '';
 $email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $visitor_type = $_POST['visitor_type'] ?? 'usc';
     $id_number = trim($_POST['id_number'] ?? '');
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
@@ -31,33 +34,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contact_number = trim($_POST['contact_number'] ?? '');
     $email = trim($_POST['email'] ?? '');
 
-    if (empty($id_number) || empty($first_name) || empty($last_name) || empty($barangay) || empty($city) || empty($province) || empty($contact_number) || empty($email)) {
-        $error = 'All fields are required.';
-    } elseif (!preg_match('/^[A-Za-z0-9-]{3,30}$/', $id_number)) {
+    if (!in_array($visitor_type, ['usc', 'non_usc'], true)) {
+        $error = 'Please select whether you are from USC.';
+    } elseif ($id_number === '') {
+        $error = $visitor_type === 'usc'
+            ? 'Please enter your USC ID number.'
+            : 'Please generate your visitor reference number.';
+    } elseif (empty($first_name) || empty($last_name) || empty($barangay) || empty($city) || empty($province) || empty($contact_number) || empty($email)) {
+        $error = 'Please complete all required fields.';
+    } elseif ($visitor_type === 'usc' && !preg_match('/^[A-Za-z0-9-]{3,30}$/', $id_number)) {
         $error = 'ID number may only contain letters, numbers, and dashes.';
+    } elseif ($visitor_type === 'non_usc' && !preg_match('/^[0-9]{5}$/', $id_number)) {
+        $error = 'Visitor reference number must be 5 digits.';
     } elseif (strlen($first_name) < 2 || strlen($last_name) < 2) {
         $error = 'First name and last name must be at least 2 characters.';
-    } elseif (!preg_match('/^[0-9+() -]{7,20}$/', $contact_number)) {
-        $error = 'Please enter a valid contact number.';
+    } elseif (!preg_match('/^[0-9]{7,20}$/', $contact_number)) {
+        $error = 'Contact number must contain numbers only.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address.';
     } else {
         try {
             $pdo->beginTransaction();
 
+            $stored_id_number = $id_number;
+
             // Insert new visitor
             $stmt = $pdo->prepare("INSERT INTO visitors (id_number, first_name, last_name, barangay, city, province, contact_number, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$id_number, $first_name, $last_name, $barangay, $city, $province, $contact_number, $email]);
+            $stmt->execute([$stored_id_number, $first_name, $last_name, $barangay, $city, $province, $contact_number, $email]);
             $visitor_id = $pdo->lastInsertId();
 
             // Auto sign-in
-            $stmtLog = $pdo->prepare("INSERT INTO visit_logs (visitor_id) VALUES (?)");
-            $stmtLog->execute([$visitor_id]);
+            recordVisitorSignIn($pdo, (int) $visitor_id);
 
             $pdo->commit();
 
-            // Redirect to success page
-            header("Location: signin.php?id=" . urlencode($id_number) . "&status=registered");
+            // Redirect to signed-in visitor page
+            header("Location: welcome.php?id=" . urlencode($stored_id_number) . "&status=registered");
             exit;
         } catch (\PDOException $e) {
             $pdo->rollBack();
@@ -86,23 +98,41 @@ require_once 'includes/header.php';
                 <div class="alert error"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="register.php" class="form-group enhanced-form" data-enhanced-form>
+            <form method="POST" action="register.php" class="form-group enhanced-form" data-enhanced-form data-membership-form>
                 <div class="field-grid">
+                    <fieldset class="field full-width membership-field">
+                        <legend>Are you from USC?</legend>
+                        <div class="membership-options">
+                            <label class="membership-option">
+                                <input type="radio" name="visitor_type" value="usc" <?= $visitor_type === 'usc' ? 'checked' : '' ?>>
+                                <span>Yes, from USC</span>
+                            </label>
+                            <label class="membership-option">
+                                <input type="radio" name="visitor_type" value="non_usc" <?= $visitor_type === 'non_usc' ? 'checked' : '' ?>>
+                                <span>No, visitor</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
                     <div class="field full-width">
-                        <label for="id_number">ID Number</label>
-                        <input
-                            type="text"
-                            id="id_number"
-                            name="id_number"
-                            value="<?= htmlspecialchars($id_number) ?>"
-                            placeholder="21700003"
-                            pattern="[A-Za-z0-9-]{3,30}"
-                            minlength="3"
-                            maxlength="30"
-                            required
-                            <?= $id_number ? '' : 'autofocus' ?>
-                        >
-                        <small>Letters, numbers, and dashes only.</small>
+                        <label for="id_number"><span data-membership-label>ID Number</span> <span class="optional-label" data-membership-note>USC only</span></label>
+                        <div class="reference-input-row">
+                            <input
+                                type="text"
+                                id="id_number"
+                                name="id_number"
+                                value="<?= htmlspecialchars($id_number) ?>"
+                                placeholder="21700003"
+                                pattern="[A-Za-z0-9-]{3,30}"
+                                minlength="3"
+                                maxlength="30"
+                                readonly
+                                <?= $id_number ? '' : 'autofocus' ?>
+                                data-membership-id
+                            >
+                            <button type="button" class="btn btn-secondary copy-reference-btn" data-copy-reference hidden>Copy</button>
+                        </div>
+                        <small data-membership-help>USC visitors should enter their school ID number.</small>
                     </div>
 
                     <div class="field">
@@ -141,7 +171,7 @@ require_once 'includes/header.php';
                             id="barangay"
                             name="barangay"
                             value="<?= htmlspecialchars($barangay) ?>"
-                            placeholder="e.g. Talamban"
+                            placeholder="Talamban"
                             maxlength="100"
                             required
                         >
@@ -154,7 +184,7 @@ require_once 'includes/header.php';
                             id="city"
                             name="city"
                             value="<?= htmlspecialchars($city) ?>"
-                            placeholder="e.g. Cebu City"
+                            placeholder="Cebu City"
                             maxlength="100"
                             required
                         >
@@ -167,7 +197,7 @@ require_once 'includes/header.php';
                             id="province"
                             name="province"
                             value="<?= htmlspecialchars($province) ?>"
-                            placeholder="e.g. Cebu"
+                            placeholder="Cebu"
                             maxlength="100"
                             required
                         >
@@ -180,8 +210,9 @@ require_once 'includes/header.php';
                             id="contact_number"
                             name="contact_number"
                             value="<?= htmlspecialchars($contact_number) ?>"
-                            placeholder="e.g. 0917 123 4567"
-                            pattern="[0-9+() -]{7,20}"
+                            placeholder="09459650774"
+                            pattern="[0-9]{7,20}"
+                            inputmode="numeric"
                             minlength="7"
                             maxlength="20"
                             required

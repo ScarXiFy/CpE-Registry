@@ -70,7 +70,7 @@ document.querySelectorAll('[data-enhanced-form]').forEach((form) => {
         barangay: 'Barangay is required.',
         city: 'City is required.',
         province: 'Province is required.',
-        contact_number: 'Use a valid contact number, 7-20 digits or symbols.',
+        contact_number: 'Use digits only, 7-20 numbers.',
         email: 'Use a valid email address.'
     };
 
@@ -123,4 +123,94 @@ document.querySelectorAll('[data-enhanced-form]').forEach((form) => {
             firstInvalidInput.focus();
         }
     });
+});
+
+document.querySelectorAll('[data-membership-form]').forEach((form) => {
+    const typeInputs = form.querySelectorAll('input[name="visitor_type"]');
+    const idInput = form.querySelector('[data-membership-id]');
+    const idLabel = form.querySelector('[data-membership-label]');
+    const idNote = form.querySelector('[data-membership-note]');
+    const idHelp = form.querySelector('[data-membership-help]');
+    const copyReferenceButton = form.querySelector('[data-copy-reference]');
+    const isRegistrationForm = form.matches('[data-enhanced-form]');
+
+    const generateReferenceNumber = () => String(Math.floor(10000 + Math.random() * 90000));
+
+    const selectedType = () => {
+        const checked = form.querySelector('input[name="visitor_type"]:checked');
+        return checked ? checked.value : 'usc';
+    };
+
+    const syncMembershipFields = () => {
+        const isUsc = selectedType() === 'usc';
+
+        if (idInput) {
+            idInput.required = true;
+            idInput.placeholder = isUsc ? '21700003' : '5-digit reference number';
+
+            if (isRegistrationForm) {
+                idInput.readOnly = !isUsc;
+                idInput.pattern = isUsc ? '[A-Za-z0-9-]{3,30}' : '[0-9]{5}';
+                idInput.minLength = isUsc ? 3 : 5;
+                idInput.maxLength = isUsc ? 30 : 5;
+
+                if (isUsc) {
+                    if (/^[0-9]{5}$/.test(idInput.value)) {
+                        idInput.value = '';
+                    }
+                } else if (!/^[0-9]{5}$/.test(idInput.value)) {
+                    idInput.value = generateReferenceNumber();
+                }
+
+                idInput.classList.remove('is-valid', 'is-invalid');
+            } else {
+                idInput.readOnly = false;
+            }
+        }
+
+        if (copyReferenceButton) {
+            copyReferenceButton.hidden = isUsc;
+        }
+
+        if (idLabel) {
+            idLabel.textContent = isUsc ? 'ID Number' : 'Reference Code';
+        }
+
+        if (idNote) {
+            idNote.textContent = isUsc ? 'USC only' : 'Generated after registration';
+        }
+
+        if (idHelp) {
+            idHelp.textContent = isUsc
+                ? 'USC visitors should enter their school ID number.'
+                : 'Copy this 5-digit reference number before continuing.';
+        }
+    };
+
+    if (copyReferenceButton && idInput) {
+        copyReferenceButton.addEventListener('click', async () => {
+            const referenceNumber = idInput.value.trim();
+
+            if (!referenceNumber) {
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(referenceNumber);
+                copyReferenceButton.textContent = 'Copied';
+                window.setTimeout(() => {
+                    copyReferenceButton.textContent = 'Copy';
+                }, 1400);
+            } catch (error) {
+                idInput.select();
+                document.execCommand('copy');
+            }
+        });
+    }
+
+    typeInputs.forEach((input) => {
+        input.addEventListener('change', syncMembershipFields);
+    });
+
+    syncMembershipFields();
 });

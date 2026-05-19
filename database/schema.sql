@@ -85,5 +85,5 @@ CREATE TABLE IF NOT EXISTS admin (
 INSERT IGNORE INTO admin (username, password)
 VALUES (
     'admin',
-    '$2y$12$6t8vc5xNl/UboFnPfSjkQeivVN0WbBVHVlpSCPM.fPXlLbPdXW7Gq'
+    '$2y$12$QXhQky9LUnPFuRWv/df1o.0UgFs16qFjZFipteVpDDVYJ2vnUYfMS'
 );

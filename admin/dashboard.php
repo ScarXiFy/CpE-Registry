@@ -6,7 +6,7 @@
  * Flow (Phase 6):
  *  1. Require auth_check to guard this page.
  *  2. Display a search form with six filters:
- *     City | Barangay | Province | ID Number | Last/First Name | Time and Day
+ *     Barangay | City | Province | ID Number | Last/First Name | Time and Day
  *  3. On submit → pass filters to admin/search.php and display results.
  */
 
@@ -45,12 +45,12 @@ require_once '../includes/header.php';
             
             <div class="form-row mt-2">
                 <div class="form-col">
-                    <label for="city">City</label>
-                    <input type="text" id="city" name="city" value="<?= htmlspecialchars($filters['city'] ?? '') ?>">
-                </div>
-                <div class="form-col">
                     <label for="barangay">Barangay</label>
                     <input type="text" id="barangay" name="barangay" value="<?= htmlspecialchars($filters['barangay'] ?? '') ?>">
+                </div>
+                <div class="form-col">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" value="<?= htmlspecialchars($filters['city'] ?? '') ?>">
                 </div>
                 <div class="form-col">
                     <label for="province">Province</label>
@@ -74,7 +74,7 @@ require_once '../includes/header.php';
                         <tr>
                             <th>ID Number</th>
                             <th>Name</th>
-                            <th>Location</th>
+                            <th>Address</th>
                             <th>Contact</th>
                             <th>Sign In</th>
                             <th>Sign Out</th>
