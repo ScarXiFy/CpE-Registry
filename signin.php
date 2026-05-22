@@ -49,6 +49,14 @@ if (!empty($id_number) && empty($error)) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($status) && $visitor) {
     try {
+        $stmtActive = $pdo->prepare("SELECT log_id FROM visit_logs WHERE visitor_id = ? AND sign_out IS NULL ORDER BY sign_in DESC LIMIT 1");
+        $stmtActive->execute([$visitor['id']]);
+
+        if ($stmtActive->fetch()) {
+            header("Location: signin.php?id=" . urlencode($id_number) . "&status=already_active");
+            exit;
+        }
+
         $stmtLog = $pdo->prepare("INSERT INTO visit_logs (visitor_id) VALUES (?)");
         $stmtLog->execute([$visitor['id']]);
         
@@ -110,6 +118,13 @@ require_once 'includes/header.php';
             </div>
             <p>Welcome back, <?= htmlspecialchars($visitor['first_name']) ?>!</p>
             <a href="index.php" class="btn btn-primary">Go to Home</a>
+
+        <?php elseif ($status === 'already_active'): ?>
+            <div class="alert success">
+                <strong>Already Signed In.</strong> Please sign out before creating a new visit.
+            </div>
+            <p>Welcome back, <?= htmlspecialchars($visitor['first_name']) ?>!</p>
+            <a href="signout.php?id=<?= urlencode($id_number) ?>" class="btn btn-primary">Sign Out</a>
             
         <?php else: ?>
             <p>Welcome back, <strong><?= htmlspecialchars($visitor['first_name'] . ' ' . $visitor['last_name']) ?></strong>!</p>
