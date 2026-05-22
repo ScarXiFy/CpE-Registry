@@ -23,7 +23,7 @@ USE cpe_registry;
 -- -------------------------------------------------------
 CREATE TABLE IF NOT EXISTS visitors (
     id             INT UNSIGNED    NOT NULL AUTO_INCREMENT,
-    id_number      VARCHAR(20)     NOT NULL,           -- student / employee ID
+    id_number      VARCHAR(30)     NOT NULL,           -- student / employee ID
     first_name     VARCHAR(60)     NOT NULL,
     last_name      VARCHAR(60)     NOT NULL,
     barangay       VARCHAR(80)     NOT NULL,
@@ -85,5 +85,5 @@ CREATE TABLE IF NOT EXISTS admin (
 INSERT IGNORE INTO admin (username, password)
 VALUES (
     'admin',
-    '$2y$12$QXhQky9LUnPFuRWv/df1o.0UgFs16qFjZFipteVpDDVYJ2vnUYfMS'
+    '$2y$10$/igu8XrF4Kgtd32jP4HMZOVucxzr7rcOOZkDTcKjzF.OZQU7xRJL6'
 );

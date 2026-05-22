@@ -61,7 +61,8 @@ if (!empty($id_number) && empty($error)) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($status) && $visitor) {
     try {
-        recordVisitorSignIn($pdo, (int) $visitor['id']);
+        $stmtLog = $pdo->prepare("INSERT INTO visit_logs (visitor_id) VALUES (?)");
+        $stmtLog->execute([$visitor['id']]);
         
         header("Location: welcome.php?id=" . urlencode($id_number) . "&status=success");
         exit;
@@ -135,7 +136,7 @@ require_once 'includes/header.php';
                 <strong>Sign In Successful!</strong>
             </div>
             <p>Welcome back, <?= htmlspecialchars($visitor['first_name']) ?>!</p>
-            <a href="welcome.php?id=<?= urlencode($id_number) ?>&status=success" class="btn btn-primary">Continue</a>
+            <a href="index.php" class="btn btn-primary">Go to Home</a>
             
         <?php else: ?>
             <p>Welcome back, <strong><?= htmlspecialchars($visitor['first_name'] . ' ' . $visitor['last_name']) ?></strong>!</p>
