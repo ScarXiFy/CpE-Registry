@@ -61,8 +61,7 @@ if (!empty($id_number) && empty($error)) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($status) && $visitor) {
     try {
-        $stmtLog = $pdo->prepare("INSERT INTO visit_logs (visitor_id) VALUES (?)");
-        $stmtLog->execute([$visitor['id']]);
+        recordVisitorSignIn($pdo, (int) $visitor['id']);
         
         header("Location: welcome.php?id=" . urlencode($id_number) . "&status=success");
         exit;

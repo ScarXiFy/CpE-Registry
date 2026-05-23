@@ -58,13 +58,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stored_id_number = $id_number;
 
-            // Insert new visitor
-            $stmt = $pdo->prepare("INSERT INTO visitors (id_number, first_name, last_name, barangay, city, province, contact_number, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$stored_id_number, $first_name, $last_name, $barangay, $city, $province, $contact_number, $email]);
-            $visitor_id = $pdo->lastInsertId();
+            $stmtExisting = $pdo->prepare("
+                SELECT id
+                FROM visitors
+                WHERE id_number = ?
+                   OR email = ?
+                   OR contact_number = ?
+                   OR (
+                        LOWER(first_name) = LOWER(?)
+                    AND LOWER(last_name) = LOWER(?)
+                    AND LOWER(barangay) = LOWER(?)
+                    AND LOWER(city) = LOWER(?)
+                    AND LOWER(province) = LOWER(?)
+                   )
+                ORDER BY
+                    CASE
+                        WHEN id_number = ? THEN 1
+                        WHEN email = ? THEN 2
+                        WHEN contact_number = ? THEN 3
+                        ELSE 4
+                    END
+                LIMIT 1
+            ");
+            $stmtExisting->execute([
+                $stored_id_number,
+                $email,
+                $contact_number,
+                $first_name,
+                $last_name,
+                $barangay,
+                $city,
+                $province,
+                $stored_id_number,
+                $email,
+                $contact_number
+            ]);
+            $existingVisitor = $stmtExisting->fetch();
+
+            if ($existingVisitor) {
+                $stmt = $pdo->prepare("
+                    UPDATE visitors
+                    SET id_number = ?,
+                        first_name = ?,
+                        last_name = ?,
+                        barangay = ?,
+                        city = ?,
+                        province = ?,
+                        contact_number = ?,
+                        email = ?
+                    WHERE id = ?
+                ");
+                $stmt->execute([
+                    $stored_id_number,
+                    $first_name,
+                    $last_name,
+                    $barangay,
+                    $city,
+                    $province,
+                    $contact_number,
+                    $email,
+                    $existingVisitor['id']
+                ]);
+                $visitor_id = (int) $existingVisitor['id'];
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO visitors (id_number, first_name, last_name, barangay, city, province, contact_number, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$stored_id_number, $first_name, $last_name, $barangay, $city, $province, $contact_number, $email]);
+                $visitor_id = (int) $pdo->lastInsertId();
+            }
 
             // Auto sign-in
-            recordVisitorSignIn($pdo, (int) $visitor_id);
+            recordVisitorSignIn($pdo, $visitor_id);
 
             $pdo->commit();
 
