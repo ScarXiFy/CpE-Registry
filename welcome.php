@@ -1,8 +1,4 @@
 <?php
-/**
- * welcome.php
- * Signed-in visitor welcome page.
- */
 
 require_once 'config/db.php';
 

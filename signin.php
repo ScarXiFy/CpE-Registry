@@ -1,13 +1,4 @@
 <?php
-/**
- * signin.php
- * Returning visitor sign-in.
- *
- * Flow (Phase 5):
- *  1. Pre-fill visitor info fetched by ID from `visitors`.
- *  2. On confirm → INSERT a new row into `visit_logs` with sign_in timestamp.
- *  3. Show a success confirmation.
- */
 
 require_once 'config/db.php';
 require_once 'includes/visit_log.php';

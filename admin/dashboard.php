@@ -1,14 +1,4 @@
 <?php
-/**
- * admin/dashboard.php
- * Admin dashboard — visitor search interface.
- *
- * Flow (Phase 6):
- *  1. Require auth_check to guard this page.
- *  2. Display a search form with six filters:
- *     Barangay | City | Province | ID Number | Last/First Name | Time and Day
- *  3. On submit → pass filters to admin/search.php and display results.
- */
 
 require_once '../includes/auth_check.php';
 require_once 'search.php'; // this populates $results and $filters

@@ -1,8 +1,5 @@
 <?php
-/**
- * includes/header.php
- * Reusable page header partial.
- */
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

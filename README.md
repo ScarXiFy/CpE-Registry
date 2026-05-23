@@ -119,12 +119,6 @@ The app uses three main tables:
 - `visit_logs` stores sign-in and sign-out records for every visit.
 - `admin` stores administrator credentials with hashed passwords.
 
-More details are available in:
-
-```text
-Documentation/ERD.md
-```
-
 ## Notes
 
 - This project is intended for local academic use.

@@ -1,14 +1,4 @@
 <?php
-/**
- * signout.php
- * Visitor sign-out.
- *
- * Flow (Phase 5):
- *  1. Accept visitor ID (via GET or session).
- *  2. Find the open visit_log row (sign_out IS NULL) for this visitor.
- *  3. UPDATE that row with the current timestamp as sign_out.
- *  4. Show a sign-out success message.
- */
 
 require_once 'config/db.php';
 

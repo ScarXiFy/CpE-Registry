@@ -1,8 +1,5 @@
 <?php
-/**
- * index.php
- * Visitor landing page.
- */
+
 require_once 'includes/header.php';
 ?>
 

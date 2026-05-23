@@ -1,8 +1,4 @@
 <?php
-/**
- * includes/visit_log.php
- * Shared visit log helpers.
- */
 
 function recordVisitorSignIn(PDO $pdo, int $visitorId): int
 {
