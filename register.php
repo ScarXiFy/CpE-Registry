@@ -1,13 +1,4 @@
 <?php
-/**
- * register.php
- * First-time visitor registration form.
- *
- * Flow (Phase 5):
- *  1. Display a form: Optional ID Number, Full Name, Address, Contact, Email.
- *  2. On submit → INSERT into `visitors`, then auto-sign-in (INSERT into `visit_logs`).
- *  3. Redirect to a sign-in confirmation screen.
- */
 
 require_once 'config/db.php';
 require_once 'includes/visit_log.php';
@@ -32,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $city = trim($_POST['city'] ?? '');
     $province = trim($_POST['province'] ?? '');
     $contact_number = trim($_POST['contact_number'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
 
     if (!in_array($visitor_type, ['usc', 'non_usc'], true)) {
         $error = 'Please select whether you are from USC.';
@@ -48,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Visitor reference number must be 5 digits.';
     } elseif (strlen($first_name) < 2 || strlen($last_name) < 2) {
         $error = 'First name and last name must be at least 2 characters.';
-    } elseif (!preg_match('/^[0-9]{7,20}$/', $contact_number)) {
-        $error = 'Contact number must contain numbers only.';
+    } elseif (!preg_match('/^(09[0-9]{9}|\+639[0-9]{9})$/', $contact_number)) {
+        $error = 'Contact number must use a valid Philippine mobile format: 09459650774 or +639549650774.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address.';
     } else {
@@ -58,44 +49,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stored_id_number = $id_number;
 
-            $stmtExisting = $pdo->prepare("
-                SELECT id
+            $stmtExisting = $pdo->prepare("SELECT id FROM visitors WHERE id_number = ? LIMIT 1");
+            $stmtExisting->execute([$stored_id_number]);
+            $existingVisitor = $stmtExisting->fetch();
+            $existingVisitorId = $existingVisitor ? (int) $existingVisitor['id'] : null;
+
+            $stmtTaken = $pdo->prepare("
+                SELECT id, contact_number, email
                 FROM visitors
-                WHERE id_number = ?
-                   OR email = ?
-                   OR contact_number = ?
-                   OR (
-                        LOWER(first_name) = LOWER(?)
-                    AND LOWER(last_name) = LOWER(?)
-                    AND LOWER(barangay) = LOWER(?)
-                    AND LOWER(city) = LOWER(?)
-                    AND LOWER(province) = LOWER(?)
-                   )
-                ORDER BY
-                    CASE
-                        WHEN id_number = ? THEN 1
-                        WHEN email = ? THEN 2
-                        WHEN contact_number = ? THEN 3
-                        ELSE 4
-                    END
+                WHERE (contact_number = ? OR email = ?)
+                  AND (? IS NULL OR id <> ?)
                 LIMIT 1
             ");
-            $stmtExisting->execute([
-                $stored_id_number,
-                $email,
-                $contact_number,
-                $first_name,
-                $last_name,
-                $barangay,
-                $city,
-                $province,
-                $stored_id_number,
-                $email,
-                $contact_number
-            ]);
-            $existingVisitor = $stmtExisting->fetch();
+            $stmtTaken->execute([$contact_number, $email, $existingVisitorId, $existingVisitorId]);
+            $takenVisitor = $stmtTaken->fetch();
 
-            if ($existingVisitor) {
+            if ($takenVisitor) {
+                $pdo->rollBack();
+
+                if ($takenVisitor['contact_number'] === $contact_number) {
+                    $error = 'This contact number is already registered.';
+                } else {
+                    $error = 'This email address is already registered.';
+                }
+            } elseif ($existingVisitor) {
+
                 $stmt = $pdo->prepare("
                     UPDATE visitors
                     SET id_number = ?,
@@ -117,27 +95,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $province,
                     $contact_number,
                     $email,
-                    $existingVisitor['id']
+                    $existingVisitorId
                 ]);
-                $visitor_id = (int) $existingVisitor['id'];
+                $visitor_id = $existingVisitorId;
             } else {
                 $stmt = $pdo->prepare("INSERT INTO visitors (id_number, first_name, last_name, barangay, city, province, contact_number, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$stored_id_number, $first_name, $last_name, $barangay, $city, $province, $contact_number, $email]);
                 $visitor_id = (int) $pdo->lastInsertId();
             }
 
-            // Auto sign-in
-            recordVisitorSignIn($pdo, $visitor_id);
+            if (!$error) {
+                // Auto sign-in
+                recordVisitorSignIn($pdo, $visitor_id);
 
-            $pdo->commit();
+                $pdo->commit();
 
-            // Redirect to signed-in visitor page
-            header("Location: welcome.php?id=" . urlencode($stored_id_number) . "&status=registered");
-            exit;
+                // Redirect to signed-in visitor page
+                header("Location: welcome.php?id=" . urlencode($stored_id_number) . "&status=registered");
+                exit;
+            }
         } catch (\PDOException $e) {
-            $pdo->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             if ($e->getCode() == 23000) { // Unique constraint violation
-                $error = 'A visitor with this ID number is already registered.';
+                $error = 'That ID number, contact number, or email address is already registered.';
             } else {
                 $error = 'Registration failed. Please try again.';
             }
@@ -274,10 +256,10 @@ require_once 'includes/header.php';
                             name="contact_number"
                             value="<?= htmlspecialchars($contact_number) ?>"
                             placeholder="09459650774"
-                            pattern="[0-9]{7,20}"
-                            inputmode="numeric"
-                            minlength="7"
-                            maxlength="20"
+                            pattern="(09[0-9]{9}|\+639[0-9]{9})"
+                            inputmode="tel"
+                            minlength="11"
+                            maxlength="13"
                             required
                         >
                     </div>

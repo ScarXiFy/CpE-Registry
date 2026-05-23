@@ -1,14 +1,4 @@
 <?php
-/**
- * admin/login.php
- * Admin login page.
- *
- * Flow (Phase 6):
- *  1. Display username + password form.
- *  2. On submit → verify against hardcoded or `admin` table credentials.
- *  3. On success → start session, redirect to admin/dashboard.php.
- *  4. On failure → show error message.
- */
 
 session_start();
 require_once '../config/db.php';

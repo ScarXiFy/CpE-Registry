@@ -1,10 +1,4 @@
 <?php
-/**
- * config/db.php
- * Database connection — to be implemented in Phase 5.
- *
- * Returns a PDO instance via $pdo.
- */
 
 $host = 'localhost';
 $db   = 'cpe_registry';

@@ -1,12 +1,3 @@
-/**
- * assets/js/main.js
- * Client-side JavaScript — to be implemented in Phase 9.
- *
- * Planned functionality:
- *  - ID-lookup form: live validation feedback
- *  - Registration form: field validation before submit
- *  - Admin search: filter toggle / UX helpers
- */
 
 const gridHero = document.querySelector('[data-grid-hero]');
 
@@ -70,7 +61,7 @@ document.querySelectorAll('[data-enhanced-form]').forEach((form) => {
         barangay: 'Barangay is required.',
         city: 'City is required.',
         province: 'Province is required.',
-        contact_number: 'Use digits only, 7-20 numbers.',
+        contact_number: 'Use 09459650774 or +639549650774.',
         email: 'Use a valid email address.'
     };
 
