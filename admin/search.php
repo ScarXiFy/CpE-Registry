@@ -36,6 +36,11 @@ if ($has_filters) {
                    l.sign_in, l.sign_out 
             FROM visitors v
             JOIN visit_logs l ON v.id = l.visitor_id
+            JOIN (
+                SELECT visitor_id, MAX(log_id) AS latest_log_id
+                FROM visit_logs
+                GROUP BY visitor_id
+            ) latest ON latest.latest_log_id = l.log_id
             WHERE 1=1";
             
     $params = [];
@@ -84,6 +89,11 @@ if ($has_filters) {
                                 l.sign_in, l.sign_out 
                          FROM visitors v
                          JOIN visit_logs l ON v.id = l.visitor_id
+                         JOIN (
+                            SELECT visitor_id, MAX(log_id) AS latest_log_id
+                            FROM visit_logs
+                            GROUP BY visitor_id
+                         ) latest ON latest.latest_log_id = l.log_id
                          ORDER BY l.sign_in DESC LIMIT 50");
     $results = $stmt->fetchAll();
 }
